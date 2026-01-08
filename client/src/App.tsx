@@ -1,11 +1,16 @@
-import React, { useState, useCallback, useRef, useEffect } from 'react';
+import { useState, useCallback, useRef, useEffect, type JSX } from 'react';
 import { Header, MainLayout } from './components/Layout';
 import { CodeEditor, EditorToolbar } from './components/Editor';
 import { OutputConsole } from './components/Console';
+import { LandingPage } from './components/LandingPage';
 import { useEditor } from './hooks/useEditor';
 import './App.css';
 
-function App() {
+type AppView = 'landing' | 'editor';
+
+function App(): JSX.Element {
+  const [currentView, setCurrentView] = useState<AppView>('landing');
+
   const {
     code,
     language,
@@ -23,6 +28,10 @@ function App() {
   const [consoleWidth, setConsoleWidth] = useState(400);
   const [isDragging, setIsDragging] = useState(false);
   const containerRef = useRef<HTMLDivElement>(null);
+
+  const handleGetStarted = useCallback(() => {
+    setCurrentView('editor');
+  }, []);
 
   const handleMouseDown = useCallback((e: React.MouseEvent) => {
     e.preventDefault();
@@ -64,6 +73,12 @@ function App() {
     };
   }, [isDragging, handleMouseMove, handleMouseUp]);
 
+  // Show landing page first
+  if (currentView === 'landing') {
+    return <LandingPage onGetStarted={handleGetStarted} />;
+  }
+
+  // Show editor after clicking Get Started
   return (
     <div className="app" data-theme={theme}>
       <Header />
