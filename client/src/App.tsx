@@ -1,14 +1,11 @@
-import { useState, useCallback, type JSX } from 'react';
+import { type JSX } from 'react';
+import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import { LandingPage } from './components/LandingPage';
 import { InterviewEditor } from './components/InterviewEditor';
 import { useEditor } from './hooks/useEditor';
 import './App.css';
 
-type AppView = 'landing' | 'editor';
-
-function App(): JSX.Element {
-  const [currentView, setCurrentView] = useState<AppView>('landing');
-
+function TeachingMode(): JSX.Element {
   const {
     code,
     language,
@@ -23,16 +20,6 @@ function App(): JSX.Element {
     clearCode,
   } = useEditor();
 
-  const handleGetStarted = useCallback(() => {
-    setCurrentView('editor');
-  }, []);
-
-  // Show landing page first
-  if (currentView === 'landing') {
-    return <LandingPage onGetStarted={handleGetStarted} />;
-  }
-
-  // Show Interview Editor after clicking Get Started
   return (
     <InterviewEditor
       code={code}
@@ -46,7 +33,53 @@ function App(): JSX.Element {
       onRun={runCode}
       onClearCode={clearCode}
       onClearOutput={clearOutput}
+      mode="teaching"
     />
+  );
+}
+
+function InterviewMode(): JSX.Element {
+  const {
+    code,
+    language,
+    theme,
+    output,
+    isRunning,
+    setCode,
+    setLanguage,
+    setTheme,
+    runCode,
+    clearOutput,
+    clearCode,
+  } = useEditor();
+
+  return (
+    <InterviewEditor
+      code={code}
+      language={language}
+      theme={theme}
+      output={output}
+      isRunning={isRunning}
+      onCodeChange={setCode}
+      onLanguageChange={setLanguage}
+      onThemeChange={setTheme}
+      onRun={runCode}
+      onClearCode={clearCode}
+      onClearOutput={clearOutput}
+      mode="interview"
+    />
+  );
+}
+
+function App(): JSX.Element {
+  return (
+    <BrowserRouter>
+      <Routes>
+        <Route path="/" element={<LandingPage />} />
+        <Route path="/teaching" element={<TeachingMode />} />
+        <Route path="/interview" element={<InterviewMode />} />
+      </Routes>
+    </BrowserRouter>
   );
 }
 

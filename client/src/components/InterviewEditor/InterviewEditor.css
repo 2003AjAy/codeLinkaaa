@@ -41,12 +41,20 @@
   letter-spacing: 0.05em;
 }
 
+.interview-mode-badge.teaching {
+  color: #22d3ee;
+}
+
 .mode-dot {
   width: 8px;
   height: 8px;
   background: #48bb78;
   border-radius: 50%;
   animation: pulse 2s infinite;
+}
+
+.mode-dot.teaching {
+  background: #22d3ee;
 }
 
 @keyframes pulse {
@@ -90,6 +98,10 @@
   color: #1a202c;
 }
 
+.interview-locked-badge.teaching {
+  background: linear-gradient(135deg, #06b6d4, #22d3ee);
+}
+
 /* Main Content */
 .interview-content {
   display: flex;
@@ -119,6 +131,10 @@
   font-weight: 600;
   letter-spacing: 0.05em;
   color: #d69e2e;
+}
+
+.teaching-mode .panel-title {
+  color: #22d3ee;
 }
 
 .panel-content {
@@ -540,21 +556,27 @@
   border-radius: 50% 50% 0 0;
 }
 
-.interviewer .video-avatar {
+.interviewer .video-avatar,
+.teacher .video-avatar {
   background: linear-gradient(135deg, #4299e1, #3182ce);
 }
 
 .interviewer .video-avatar::after,
-.interviewer .video-avatar::before {
+.interviewer .video-avatar::before,
+.teacher .video-avatar::after,
+.teacher .video-avatar::before {
   background: #63b3ed;
 }
 
-.candidate .video-avatar {
+.candidate .video-avatar,
+.student .video-avatar {
   background: linear-gradient(135deg, #48bb78, #38a169);
 }
 
 .candidate .video-avatar::after,
-.candidate .video-avatar::before {
+.candidate .video-avatar::before,
+.student .video-avatar::after,
+.student .video-avatar::before {
   background: #68d391;
 }
 

@@ -1,5 +1,5 @@
 import React, { useState, useRef, useEffect, useCallback } from 'react';
-import { Clock, Lock, FileText, ChevronDown, RotateCcw, Play } from 'lucide-react';
+import { Clock, Lock, FileText, ChevronDown, RotateCcw, Play, BookOpen, Briefcase } from 'lucide-react';
 import { CodeEditor } from '../Editor';
 import { SupportedLanguage, EditorTheme, ConsoleOutput } from '../../types/editor';
 import { LANGUAGE_LIST } from '../../config/languages';
@@ -29,6 +29,7 @@ interface InterviewEditorProps {
   onRun: () => void;
   onClearCode: () => void;
   onClearOutput: () => void;
+  mode?: 'teaching' | 'interview';
 }
 
 const defaultQuestion: Question = {
@@ -58,6 +59,7 @@ export const InterviewEditor: React.FC<InterviewEditorProps> = ({
   onRun,
   onClearCode,
   onClearOutput,
+  mode = 'interview',
 }) => {
   const [question, setQuestion] = useState<Question>(defaultQuestion);
   const [isEditingQuestion, setIsEditingQuestion] = useState(false);
@@ -74,6 +76,10 @@ export const InterviewEditor: React.FC<InterviewEditorProps> = ({
   const centerPanelRef = useRef<HTMLDivElement>(null);
   const consoleEndRef = useRef<HTMLDivElement>(null);
   const contentRef = useRef<HTMLDivElement>(null);
+
+  const isTeachingMode = mode === 'teaching';
+  const modeLabel = isTeachingMode ? 'TEACHING MODE' : 'INTERVIEW MODE';
+  const ModeIcon = isTeachingMode ? BookOpen : Briefcase;
 
   // Timer
   useEffect(() => {
@@ -162,7 +168,6 @@ export const InterviewEditor: React.FC<InterviewEditorProps> = ({
   };
 
   const handleQuestionSave = () => {
-    // Parse the question text back to structure
     const lines = questionText.split('\n');
     let title = '';
     let description = '';
@@ -208,14 +213,15 @@ export const InterviewEditor: React.FC<InterviewEditorProps> = ({
   };
 
   return (
-    <div className="interview-editor" data-theme={theme}>
+    <div className={`interview-editor ${isTeachingMode ? 'teaching-mode' : ''}`} data-theme={theme}>
       {/* Header */}
       <header className="interview-header">
         <div className="interview-header-left">
           <img src="/codeLinkaLogo.png" alt="CodeLinka" className="interview-logo" />
-          <div className="interview-mode-badge">
-            <span className="mode-dot"></span>
-            <span>INTERVIEW MODE</span>
+          <div className={`interview-mode-badge ${isTeachingMode ? 'teaching' : ''}`}>
+            <span className={`mode-dot ${isTeachingMode ? 'teaching' : ''}`}></span>
+            <ModeIcon size={14} />
+            <span>{modeLabel}</span>
           </div>
           <div className="interview-timer">
             <Clock size={16} />
@@ -223,10 +229,10 @@ export const InterviewEditor: React.FC<InterviewEditorProps> = ({
           </div>
         </div>
         <div className="interview-header-right">
-          <div className="interview-locked-badge">
+          <div className={`interview-locked-badge ${isTeachingMode ? 'teaching' : ''}`}>
             <Lock size={14} />
             <Lock size={14} />
-            <span>Interview Locked</span>
+            <span>{isTeachingMode ? 'Session Active' : 'Interview Locked'}</span>
           </div>
         </div>
       </header>
@@ -236,7 +242,7 @@ export const InterviewEditor: React.FC<InterviewEditorProps> = ({
         {/* Left Panel - Question */}
         <div className="interview-panel question-panel" style={{ width: leftPanelWidth }}>
           <div className="panel-header">
-            <span className="panel-title">QUESTION</span>
+            <span className="panel-title">{isTeachingMode ? 'LESSON' : 'QUESTION'}</span>
             <button
               className="edit-question-btn"
               onClick={isEditingQuestion ? handleQuestionSave : handleQuestionEdit}
@@ -395,16 +401,16 @@ export const InterviewEditor: React.FC<InterviewEditorProps> = ({
           {/* Video Feeds */}
           <div className="video-section">
             <div className="video-card">
-              <div className="video-placeholder interviewer">
+              <div className={`video-placeholder ${isTeachingMode ? 'teacher' : 'interviewer'}`}>
                 <div className="video-avatar"></div>
               </div>
-              <span className="video-label">Interviewer</span>
+              <span className="video-label">{isTeachingMode ? 'Teacher' : 'Interviewer'}</span>
             </div>
             <div className="video-card">
-              <div className="video-placeholder candidate">
+              <div className={`video-placeholder ${isTeachingMode ? 'student' : 'candidate'}`}>
                 <div className="video-avatar"></div>
               </div>
-              <span className="video-label">Candidate</span>
+              <span className="video-label">{isTeachingMode ? 'Student' : 'Candidate'}</span>
             </div>
           </div>
 
@@ -422,7 +428,7 @@ export const InterviewEditor: React.FC<InterviewEditorProps> = ({
                 className="notes-textarea"
                 value={notes}
                 onChange={(e) => setNotes(e.target.value)}
-                placeholder="Add interview notes here..."
+                placeholder={isTeachingMode ? "Add lesson notes here..." : "Add interview notes here..."}
               />
             )}
           </div>

@@ -1,4 +1,5 @@
 import React from 'react';
+import { useNavigate } from 'react-router-dom';
 import {
   Code2,
   Video,
@@ -12,11 +13,17 @@ import {
 } from 'lucide-react';
 import './LandingPage.css';
 
-interface LandingPageProps {
-  onGetStarted: () => void;
-}
+export const LandingPage: React.FC = () => {
+  const navigate = useNavigate();
 
-export const LandingPage: React.FC<LandingPageProps> = ({ onGetStarted }) => {
+  const handleStartTeaching = () => {
+    navigate('/teaching');
+  };
+
+  const handleStartInterview = () => {
+    navigate('/interview');
+  };
+
   return (
     <div className="landing-page">
       {/* Navigation */}
@@ -28,7 +35,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onGetStarted }) => {
           <div className="nav-links">
             <a href="#features" className="nav-link">Features</a>
             <a href="#modes" className="nav-link">Modes</a>
-            <button className="nav-cta" onClick={onGetStarted}>
+            <button className="nav-cta" onClick={handleStartInterview}>
               Get Started
             </button>
           </div>
@@ -56,7 +63,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onGetStarted }) => {
             </p>
 
             <div className="hero-actions">
-              <button className="hero-btn-primary" onClick={onGetStarted}>
+              <button className="hero-btn-primary" onClick={handleStartInterview}>
                 Start Collaborating
               </button>
             </div>
@@ -164,7 +171,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onGetStarted }) => {
                   ))}
                 </ul>
 
-                <button className="mode-btn mode-btn-cyan" onClick={onGetStarted}>
+                <button className="mode-btn mode-btn-cyan" onClick={handleStartTeaching}>
                   Start Teaching
                 </button>
               </div>
@@ -198,7 +205,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onGetStarted }) => {
                   ))}
                 </ul>
 
-                <button className="mode-btn mode-btn-blue" onClick={onGetStarted}>
+                <button className="mode-btn mode-btn-blue" onClick={handleStartInterview}>
                   Start Interview
                 </button>
               </div>
@@ -215,7 +222,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onGetStarted }) => {
             <p className="cta-description">
               Join developers, educators, and teams who are already using CodeLinka to work better together.
             </p>
-            <button className="cta-btn" onClick={onGetStarted}>
+            <button className="cta-btn" onClick={handleStartInterview}>
               Get Started Free
             </button>
           </div>
