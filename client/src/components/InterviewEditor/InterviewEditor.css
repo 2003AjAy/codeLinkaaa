@@ -76,6 +76,16 @@
   gap: 0.75rem;
 }
 
+.header-language-badge,
+.header-theme-badge {
+  padding: 0.375rem 0.75rem;
+  background: #2d3748;
+  border-radius: 0.25rem;
+  font-size: 0.75rem;
+  font-weight: 500;
+  color: #e2e8f0;
+}
+
 .interview-locked-badge {
   display: flex;
   align-items: center;
