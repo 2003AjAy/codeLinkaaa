@@ -464,6 +464,64 @@
   color: #ffffff;
 }
 
+/* Join Section */
+.join-section {
+  margin-top: 3rem;
+}
+
+.join-card {
+  background: linear-gradient(135deg, rgba(99, 102, 241, 0.1) 0%, rgba(139, 92, 246, 0.1) 100%);
+  border: 1px solid rgba(139, 92, 246, 0.3);
+  border-radius: 1rem;
+  padding: 2rem;
+}
+
+.join-card-content {
+  display: flex;
+  align-items: center;
+  gap: 2rem;
+}
+
+.join-icon {
+  width: 3rem;
+  height: 3rem;
+  color: #a78bfa;
+  flex-shrink: 0;
+}
+
+.join-text {
+  flex: 1;
+}
+
+.join-text h3 {
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: #ffffff;
+  margin-bottom: 0.5rem;
+}
+
+.join-text p {
+  color: #94a3b8;
+  font-size: 0.95rem;
+}
+
+.join-btn {
+  padding: 0.75rem 2rem;
+  background: rgba(139, 92, 246, 0.1);
+  border: 1px solid rgba(139, 92, 246, 0.5);
+  color: #a78bfa;
+  border-radius: 0.5rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+  white-space: nowrap;
+}
+
+.join-btn:hover {
+  background: #8b5cf6;
+  color: #ffffff;
+}
+
 /* CTA Section */
 .cta-section {
   max-width: 1280px;

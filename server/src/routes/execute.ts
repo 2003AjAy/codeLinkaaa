@@ -1,10 +1,26 @@
 import { Router, Request, Response } from 'express';
 import { executeInDocker, checkDockerHealth } from '../services/dockerRunner';
+import { executeWithPiston, checkPistonHealth } from '../services/pistonRunner';
 import { ExecutionRequest, SupportedLanguage, LANGUAGE_CONFIGS } from '../types';
 
 const router = Router();
 
 const SUPPORTED_LANGUAGES = Object.keys(LANGUAGE_CONFIGS) as SupportedLanguage[];
+
+// Cache Docker availability check
+let dockerAvailable: boolean | null = null;
+let lastDockerCheck = 0;
+const DOCKER_CHECK_INTERVAL = 30000; // Check every 30 seconds
+
+async function isDockerAvailable(): Promise<boolean> {
+  const now = Date.now();
+  if (dockerAvailable !== null && now - lastDockerCheck < DOCKER_CHECK_INTERVAL) {
+    return dockerAvailable;
+  }
+  dockerAvailable = await checkDockerHealth();
+  lastDockerCheck = now;
+  return dockerAvailable;
+}
 
 router.post('/run', async (req: Request, res: Response) => {
   const { code, language, input } = req.body as ExecutionRequest;
@@ -39,7 +55,16 @@ router.post('/run', async (req: Request, res: Response) => {
   }
 
   try {
-    const result = await executeInDocker(code, language, input);
+    let result;
+
+    // Try Docker first, fall back to Piston API if Docker is not available
+    if (await isDockerAvailable()) {
+      result = await executeInDocker(code, language, input);
+    } else {
+      console.log('Docker not available, using Piston API fallback');
+      result = await executeWithPiston(code, language, input);
+    }
+
     res.json(result);
   } catch (err) {
     const errorMessage = err instanceof Error ? err.message : 'Execution failed';
@@ -54,10 +79,16 @@ router.post('/run', async (req: Request, res: Response) => {
 
 router.get('/health', async (_req: Request, res: Response) => {
   const dockerHealthy = await checkDockerHealth();
+  const pistonHealthy = await checkPistonHealth();
+
+  // Status is ok if either Docker or Piston is available
+  const hasExecutor = dockerHealthy || pistonHealthy;
 
   res.json({
-    status: dockerHealthy ? 'ok' : 'degraded',
+    status: hasExecutor ? 'ok' : 'degraded',
     docker: dockerHealthy,
+    piston: pistonHealthy,
+    executor: dockerHealthy ? 'docker' : pistonHealthy ? 'piston' : 'none',
     timestamp: new Date().toISOString(),
     supportedLanguages: SUPPORTED_LANGUAGES,
   });

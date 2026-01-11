@@ -7,6 +7,8 @@ export const users = pgTable('users', {
   email: text('email').notNull().unique(),
   name: text('name').notNull(),
   avatarUrl: text('avatar_url'),
+  googleId: text('google_id').unique(),
+  role: text('role').$type<'teacher' | 'interviewer' | 'user'>().default('user'),
   createdAt: timestamp('created_at').defaultNow().notNull(),
   updatedAt: timestamp('updated_at').defaultNow().notNull(),
 });
@@ -31,7 +33,7 @@ export const sessionParticipants = pgTable('session_participants', {
   id: uuid('id').primaryKey().defaultRandom(),
   sessionId: uuid('session_id').references(() => sessions.id).notNull(),
   userId: uuid('user_id').references(() => users.id).notNull(),
-  role: text('role').notNull().$type<'host' | 'interviewer' | 'candidate' | 'teacher' | 'student'>(),
+  role: text('role').notNull().$type<'host' | 'participant'>(),
   joinedAt: timestamp('joined_at').defaultNow().notNull(),
   leftAt: timestamp('left_at'),
 });

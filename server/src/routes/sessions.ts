@@ -96,11 +96,10 @@ router.post('/', async (req, res) => {
     }).returning();
 
     // Add host as participant
-    const hostRole = mode === 'interview' ? 'interviewer' : 'teacher';
     await db.insert(sessionParticipants).values({
       sessionId: newSession[0].id,
       userId: hostId,
-      role: hostRole,
+      role: 'host',
     });
 
     res.status(201).json({ success: true, data: newSession[0] });
@@ -145,14 +144,17 @@ router.put('/:id', async (req, res) => {
 router.post('/:id/join', async (req, res) => {
   try {
     const { id } = req.params;
-    const { userId, role } = req.body;
+    const { userId } = req.body;
 
-    if (!userId || !role) {
+    if (!userId) {
       return res.status(400).json({
         success: false,
-        error: 'userId and role are required',
+        error: 'userId is required',
       });
     }
+
+    // Users joining are always participants (not hosts)
+    const role: 'host' | 'participant' = 'participant';
 
     // Check if session exists and is active
     const session = await db.select().from(sessions).where(eq(sessions.id, id));

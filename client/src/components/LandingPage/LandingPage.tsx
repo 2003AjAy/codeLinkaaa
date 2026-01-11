@@ -1,5 +1,4 @@
-import React from 'react';
-import { useNavigate } from 'react-router-dom';
+import React, { useState } from 'react';
 import {
   Code2,
   Video,
@@ -11,17 +10,41 @@ import {
   Globe,
   Shield
 } from 'lucide-react';
+import { useAuth } from '../../context/AuthContext';
+import { AuthModal } from '../Modals/AuthModal';
 import './LandingPage.css';
 
+type AuthMode = 'teaching' | 'interview';
+
 export const LandingPage: React.FC = () => {
-  const navigate = useNavigate();
+  const { login } = useAuth();
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [authMode, setAuthMode] = useState<AuthMode>('interview');
 
   const handleStartTeaching = () => {
-    navigate('/teaching');
+    setAuthMode('teaching');
+    setIsModalOpen(true);
   };
 
   const handleStartInterview = () => {
-    navigate('/interview');
+    setAuthMode('interview');
+    setIsModalOpen(true);
+  };
+
+  const handleJoinAsUser = () => {
+    // For "Join Room" button, we'll open interview mode modal
+    // since it has the same join flow
+    setAuthMode('interview');
+    setIsModalOpen(true);
+  };
+
+  const handleModalLogin = (role: 'teacher' | 'interviewer' | 'user', roomId?: string) => {
+    setIsModalOpen(false);
+    login(role, roomId);
+  };
+
+  const handleModalClose = () => {
+    setIsModalOpen(false);
   };
 
   return (
@@ -211,6 +234,22 @@ export const LandingPage: React.FC = () => {
               </div>
             </div>
           </div>
+
+          {/* Join Room Section */}
+          <div className="join-section">
+            <div className="join-card">
+              <div className="join-card-content">
+                <Users className="join-icon" />
+                <div className="join-text">
+                  <h3>Join an Existing Room</h3>
+                  <p>Have a room ID? Sign in as a participant to join a teaching session or interview.</p>
+                </div>
+                <button className="join-btn" onClick={handleJoinAsUser}>
+                  Join Room
+                </button>
+              </div>
+            </div>
+          </div>
         </section>
 
         {/* CTA Section */}
@@ -238,6 +277,14 @@ export const LandingPage: React.FC = () => {
           <p className="footer-copyright">© 2026 CodeLinka. All rights reserved.</p>
         </div>
       </footer>
+
+      {/* Auth Modal */}
+      <AuthModal
+        isOpen={isModalOpen}
+        mode={authMode}
+        onClose={handleModalClose}
+        onLogin={handleModalLogin}
+      />
     </div>
   );
 };

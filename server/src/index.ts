@@ -1,20 +1,44 @@
 import 'dotenv/config';
 import express from 'express';
 import cors from 'cors';
+import cookieParser from 'cookie-parser';
+import session from 'express-session';
+import passport from './config/passport';
 import executeRouter from './routes/execute';
 import usersRouter from './routes/users';
 import sessionsRouter from './routes/sessions';
 import questionsRouter from './routes/questions';
 import notesRouter from './routes/notes';
+import authRouter from './routes/auth';
 
 const app = express();
 const PORT = process.env.PORT || 5000;
+const CLIENT_URL = process.env.CLIENT_URL || 'http://localhost:3000';
 
 // Middleware
-app.use(cors());
+app.use(cors({
+  origin: CLIENT_URL,
+  credentials: true, // Allow cookies
+}));
 app.use(express.json({ limit: '1mb' }));
+app.use(cookieParser());
+
+// Session middleware (required for passport OAuth flow)
+app.use(session({
+  secret: process.env.JWT_SECRET || 'codelinka_session_secret',
+  resave: false,
+  saveUninitialized: false,
+  cookie: {
+    secure: process.env.NODE_ENV === 'production',
+    maxAge: 5 * 60 * 1000, // 5 minutes - just for OAuth flow
+  },
+}));
+
+app.use(passport.initialize());
+app.use(passport.session());
 
 // Routes
+app.use('/api/auth', authRouter);
 app.use('/api', executeRouter);
 app.use('/api/users', usersRouter);
 app.use('/api/sessions', sessionsRouter);
@@ -27,6 +51,13 @@ app.get('/', (_req, res) => {
     name: 'CodeLinka Server',
     version: '1.0.0',
     endpoints: {
+      auth: {
+        login: 'GET /api/auth/login?role=teacher|interviewer|user',
+        callback: 'GET /api/auth/callback',
+        me: 'GET /api/auth/me',
+        logout: 'POST /api/auth/logout',
+        status: 'GET /api/auth/status',
+      },
       health: 'GET /api/health',
       execute: 'POST /api/run',
       languages: 'GET /api/languages',
@@ -80,16 +111,12 @@ app.use((err: Error, _req: express.Request, res: express.Response, _next: expres
 app.listen(PORT, () => {
   console.log(`CodeLinka server running on http://localhost:${PORT}`);
   console.log('Endpoints:');
+  console.log('  Auth:');
+  console.log('    GET  /api/auth/login?role=  - Start OAuth login');
+  console.log('    GET  /api/auth/me           - Get current user');
+  console.log('    POST /api/auth/logout       - Logout');
   console.log('  Code Execution:');
-  console.log('    GET  /api/health     - Check server and Docker status');
-  console.log('    POST /api/run        - Execute code');
-  console.log('    GET  /api/languages  - List supported languages');
-  console.log('  Users:');
-  console.log('    GET/POST /api/users  - List/Create users');
-  console.log('  Sessions:');
-  console.log('    GET/POST /api/sessions - List/Create sessions');
-  console.log('  Questions:');
-  console.log('    GET/POST /api/questions - Manage questions');
-  console.log('  Notes:');
-  console.log('    GET/POST /api/notes  - Manage session notes');
+  console.log('    GET  /api/health            - Check server status');
+  console.log('    POST /api/run               - Execute code');
+  console.log('  Sessions, Users, Questions, Notes...');
 });
